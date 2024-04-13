@@ -41,7 +41,7 @@ def get_pods_all_ns(ns_name):
 
     pods_data = []
 
-    ret = v1.list_pod_for_all_namespaces(namespace=ns_name, watch=False)
+    ret = v1.list_pod_for_all_namespaces(watch=False)
 
     for i in ret.items:
         pod_info = {
