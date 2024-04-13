@@ -39,11 +39,21 @@ def get_pods_all_ns(ns_name):
 
     v1 = client.CoreV1Api()
 
-    pods = v1.list_namespaced_pod(ns_name)
+    pods_data = []
 
-    for pod in pods.items:
+    ret = v1.list_pod_for_all_namespaces(namespace=ns_name, watch=False)
 
-        return jsonify(pod.metadata.name)
+    for i in ret.items:
+        pod_info = {
+            "namespace": i.metadata.namespace,
+            "name": i.metadata.name,
+            "pod_ip": i.status.pod_ip
+        }
+
+        pods_data.append(pod_info)
+
+    return jsonify(pods_data)
+
 
 
 if __name__ == '__main__':
