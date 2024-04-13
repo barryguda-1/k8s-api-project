@@ -32,7 +32,7 @@ def get_namespace():
         return jsonify(ns.metadata.name)
 
 
-@app.route('/pods/<str:ns_name>', methods=['GET'])
+@app.route('/pods/<ns_name>', methods=['GET'])
 def get_pods_all_ns(ns_name):
 
     config.load_kube_config()
