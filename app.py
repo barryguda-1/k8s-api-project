@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from flask import Flask, jsonify, request
 from kubernetes import client, config
 
@@ -6,7 +8,7 @@ app = Flask(__name__)
 
 @app.route('/nodes', methods=['GET'])
 def get_nodes():
-
+    ## Create an instance of the Kubernetes Client
     config.load_kube_config()
 
     v1 = client.CoreV1Api()
@@ -54,6 +56,23 @@ def get_pods_all_ns(ns_name):
 
     return jsonify(pods_data)
 
+
+@app.route('/namespaces/<ns_name>', methods=['DELETE'])
+def delete_namespace(ns_name):
+
+    config.load_kube_config()
+
+    v1 = client.CoreV1Api()
+
+    ##Delete namespace
+    try:
+        v1.delete_namespace(name=ns_name, body=client.V1DeleteOptions())
+
+        return jsonify({"message": "namespace deleted"}),200
+
+    except client.exceptions.ApiException as e:
+
+        return jsonify({"messsage": str(e)}),400
 
 
 if __name__ == '__main__':
