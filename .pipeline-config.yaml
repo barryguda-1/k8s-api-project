@@ -1,0 +1,35 @@
+version: '1'
+
+setup:
+  image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.43
+  script: |
+    #!/usr/bin/env bash
+
+    if [[ "$PIPELINE_DEBUG" == 1 ]]; then
+      trap env EXIT
+      env
+      set -x
+    fi
+
+    if [[ "$(get_env pipeline_namespace "")" == "cd" || "$(get_env pipeline_namespace "")" == "cc" ]]; then
+      echo "No setup when running CD or CC pipeline..."
+      exit 0
+    fi
+
+    source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/scripts/code_setup.sh
+
+containerize:
+  image: icr.io/continuous-delivery/pipeline/pipeline-base-ubi:3.43
+  dind: true
+  script: |
+    #!/usr/bin/env bash
+
+    if [[ "$PIPELINE_DEBUG" == 1 ]]; then
+      trap env EXIT
+      env
+      set -x
+    fi
+    echo "***********reached build********"
+    cd "$WORKSPACE/$(load_repo app-repo path)"
+    source $WORKSPACE/$PIPELINE_CONFIG_REPO_PATH/scripts/build.sh
+
