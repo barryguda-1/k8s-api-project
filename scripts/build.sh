@@ -15,7 +15,7 @@ docker login -u iamapikey --password-stdin "icr.io" <<< "$(get_env icr_push_apik
 docker tag k8s-service:v1 icr.io/bg-devops-test/k8s-service:v1
 docker images
 docker push icr.io/bg-devops-test/k8s-service:v1
-digest=$(docker inspect --format='{{index .RepoDigests 0}}' icr.io/namespace/k8s-service:v1 | cut -d@ -f2)
+digest=$(docker inspect --format='{{index .RepoDigests 0}}' icr.io/bg-devops-test/k8s-service:v1 | cut -d@ -f2)
 echo "saving artifact"
 save_artifact ui_service "name=icr.io/k8s-service:v1"
 save_artifact ui_service "type=image"
