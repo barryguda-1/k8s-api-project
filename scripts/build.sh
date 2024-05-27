@@ -1,23 +1,40 @@
 #!/bin/bash
 set -euo pipefail
+
+DOCKER_COMPOSE_VERSION="v2.23.0"
+DOCKER_COMPOSE_BIN="/usr/local/bin/docker-compose"
+DOCKER_IMAGE_NAME="k8s-service:v1"
+DOCKER_REGISTRY="icr.io"
+DOCKER_NAMESPACE="bg-devops-test"
+DOCKER_REPOSITORY="${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${DOCKER_IMAGE_NAME}"
+
 echo "docker installation started........."
-curl -SL https://github.com/docker/compose/releases/download/v2.23.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+curl -SL "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-linux-x86_64" -o ${DOCKER_COMPOSE_BIN}
 echo "docker installation done"
-sudo chmod +x /usr/local/bin/docker-compose
+
+sudo chmod +x ${DOCKER_COMPOSE_BIN}
 docker ps
 echo "docker installation done........."
-DOCKER_BUILD_ARGS="-t k8s-service:v1" 
-echo $DOCKER_BUILD_ARGS
-docker build $DOCKER_BUILD_ARGS . 
+
+DOCKER_BUILD_ARGS="-t ${DOCKER_IMAGE_NAME}"
+echo ${DOCKER_BUILD_ARGS}
+docker build ${DOCKER_BUILD_ARGS} .
+
 echo "docker build done........."
 
-docker login -u iamapikey --password-stdin "icr.io" <<< "$(get_env ibmcloud-api-key)"
-docker tag k8s-service:v1 icr.io/bg-devops-test/k8s-service:v1
+DOCKER_LOGIN_COMMAND="docker login -u iamapikey --password-stdin ${DOCKER_REGISTRY}"
+DOCKER_TAG_COMMAND="docker tag ${DOCKER_IMAGE_NAME} ${DOCKER_REPOSITORY}"
+DOCKER_PUSH_COMMAND="docker push ${DOCKER_REPOSITORY}"
+
+${DOCKER_LOGIN_COMMAND} <<< "$(get_env ibmcloud-api-key)"
+${DOCKER_TAG_COMMAND}
 docker images
-docker push icr.io/bg-devops-test/k8s-service:v1
-digest=$(docker inspect --format='{{index .RepoDigests 0}}' icr.io/bg-devops-test/k8s-service:v1 | cut -d@ -f2)
+${DOCKER_PUSH_COMMAND}
+
+digest=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKER_REPOSITORY} | cut -d@ -f2)
 echo "saving artifact"
-save_artifact ui_service "name=icr.io/k8s-service:v1"
+
+save_artifact ui_service "name=${DOCKER_REPOSITORY}"
 save_artifact ui_service "type=image"
 save_artifact ui_service "digest=${digest}"
 save_artifact ui_service "image_type=nonprod"
