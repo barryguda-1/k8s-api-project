@@ -34,8 +34,8 @@ ${DOCKER_PUSH_COMMAND}
 digest=$(docker inspect --format='{{index .RepoDigests 0}}' ${DOCKER_REPOSITORY} | cut -d@ -f2)
 echo "saving artifact"
 
-save_artifact ui_service "name=${DOCKER_REPOSITORY}"
-save_artifact ui_service "type=image"
-save_artifact ui_service "digest=${digest}"
-save_artifact ui_service "image_type=nonprod"
-save_artifact ui_service "twistlock_group=$(get_env twistlock-group-id)"
+save_artifact k8s_service "name=${DOCKER_REPOSITORY}"
+save_artifact k8s_service "type=image"
+save_artifact k8s_service "digest=${digest}"
+save_artifact k8s_service "image_type=nonprod"
+save_artifact k8s_service "twistlock_group=$(get_env twistlock-group-id)"
