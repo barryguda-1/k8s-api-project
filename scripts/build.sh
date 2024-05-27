@@ -11,7 +11,7 @@ echo $DOCKER_BUILD_ARGS
 docker build $DOCKER_BUILD_ARGS . 
 echo "docker build done........."
 
-docker login -u iamapikey --password-stdin "icr.io" <<< "$(get_env icr_push_apikey)"
+docker login -u iamapikey --password-stdin "icr.io" <<< "$(get_env ibmcloud-api-key)"
 docker tag k8s-service:v1 icr.io/bg-devops-test/k8s-service:v1
 docker images
 docker push icr.io/bg-devops-test/k8s-service:v1
